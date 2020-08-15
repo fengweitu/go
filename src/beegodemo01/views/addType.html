@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑文章类型</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/customize.css">
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            $.ajax({
+                url: "/v1/addtype/content",
+                type: "get",
+                success: function (data) {
+                    var username;
+                    $.each(data, function (index, vals) {
+                        if (index == "articletype") {
+                            var account = 0;
+                            console.log(vals);
+                            $.each(vals, function (key, val) {
+                                var id;
+                                var type;
+                                $.each(val, function (key, value) {
+                                    if (key == "Id") {
+                                        id = value;
+                                    }
+                                    if (key == "TypeName") {
+                                        type = value;
+                                    }
+                                });
+                                var html = "<tr>" +
+                                    "<td>" + id + "</td>" +
+                                    "<td>" + type + "</td>" +
+                                    "<td><span class='aslink' onclick='del(this)'>删除</span></td>" +
+                                    "</tr>";
+                                $("div>div>table>tbody>tr").eq(account).after(html);
+                                account = account + 1;
+                            });
+                        }
+                        if (index=="username"){
+                            username=vals;
+                        }
+                        $(".side_bar>.user_info>img").attr("alt",username);
+                        $(".side_bar>.user_info>p>em").text(username);
+                    });
+                },
+                error: function () {
+                    alert("加载文件类型出错");
+                }
+            });
+        }
+
+        function addType() {
+            var typeName = $(".type_txt").val();
+            var str = {"typeName": typeName};
+            var data = JSON.stringify(str);
+            $.ajax({
+                url: "/v1/addtype/content",
+                type: "post",
+                data: data,
+                success: function (data) {
+                    alert("no:" + data.msg_no + " content:" + data.msg_content);
+                    window.location.href = "/v1/addtype";
+                },
+                error: function () {
+                    alert("出错");
+                }
+            })
+        }
+
+        function del(obj) {
+            var id = $(obj).parent().parent().children().eq(0).text();
+            var str = {"id": id};
+            var data = JSON.stringify(str);
+            var r = confirm("是否删除？");
+            if (r == true) {
+                $.ajax({
+                    url: "/v1/deltype",
+                    type: "post",
+                    data: data,
+                    success: function (data) {
+                        alert("no:" + data.msg_no + "   message:" + data.msg_content);
+                        window.location.href = "/v1/addtype";
+                    },
+                    error: function () {
+                        alert("失败");
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="header">
+    <a href="#" class="logo fl"><img src="/static/img/logo.png" alt="logo"></a>
+    <a href="/logout" class="logout fr" onclick="if(confirm('确定退出?')==false)return false;">退 出</a>
+</div>
+
+<div class="side_bar">
+    <div class="user_info">
+        <img src="/static/img/person.png" alt="张大山">
+        <p>欢迎你 <em></em></p>
+    </div>
+
+    <div class="menu_con">
+        <div class="first_menu active"><a href="javascript:;" class="icon02">文章管理</a></div>
+        <ul class="sub_menu show">
+            <li><a href="/v1/index" class="icon031">文章列表</a></li>
+            <li><a href="/v1/addarticle" class="icon032">添加文章</a></li>
+            <li><a href="/v1/addtype" class="icon034">添加分类</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="main_body" id="main_body">
+    <div class="breadcrub">
+        当前位置：文章管理>添加分类
+    </div>
+    <div class="pannel">
+        <table class="common_table">
+            <tr>
+                <th width="10%">id</th>
+                <th width="70%">类别名称</th>
+                <th width="20%">管理操作</th>
+            </tr>
+
+            <tr>
+                <td colspan="3">
+                    <form method="POST" action="/v1/addtype">
+                        <input type="text" class="type_txt" placeholder="添加分类" name="typeName">
+                        <input type="button" class="addtype" value="增加分类" onclick="addType()">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+</body>
+</html>

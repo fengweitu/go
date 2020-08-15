@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <script>
+        function register() {
+            var username=$("#username").val();
+            var password=$("#password").val();
+            var str={"username":username,"password":password};
+            var registerData=JSON.stringify(str);
+            $.ajax({
+                url:"/register",
+                type:"post",
+                data:registerData,
+                success:function (data) {
+                    // alert(data.msg_no+" "+data.msg_content);
+                    if (data.msg_no==1) {
+                        alert(data.msg_content);
+                        window.location.href="/register";
+                    }
+                    if (data.msg_no==2) {
+                        alert(data.msg_content);
+                        window.location.href="/login";
+                    }
+                },
+                error:function(){
+                    alert("注册失败");
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<div class="login_logo">
+        <img src="/static/img/logo.png" alt="">
+    </div>
+    <form  class="login_form" name = "login" method="POST" action="/register">     
+        <h1 class="login_title">用户注册</h1>
+        <input type="text" placeholder="用户名" class="input_txt" id="username" name="userName">
+        <input type="password" placeholder="密码" class="input_txt" id="password" name = "password">
+        <input type="button" value="注 册" class="input_sub" onclick="register()">
+    </form>
+    <div class="login_bg"></div>
+</body>
+</html>

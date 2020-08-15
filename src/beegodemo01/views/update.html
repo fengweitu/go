@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>更新文章内容</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <script>
+        window.onload = function () {
+            var url = decodeURI(window.location.href, "utf-8");
+            console.log(url);
+            var id = url.split("?")[1].split("&")[0].split("=")[1];
+            console.log(id);
+            var str = {"id": id}
+            var data = JSON.stringify(str);
+            $.ajax({
+                url: "/v1/edit",
+                type: "post",
+                data: data,
+                success: function (data) {
+                    console.log(data);
+                    var id;
+                    var title;
+                    var content;
+                    var img;
+                    $.each(data, function (index, values) {
+                        if (index == "article") {
+                            $.each(values, function (index, value) {
+                                if (index == "Id") {
+                                    id = value;
+                                }
+                                if (index == "Title") {
+                                    title = value;
+                                }
+                                if (index == "Content") {
+                                    content = value;
+                                }
+                                if (index == "Img") {
+                                    img = value;
+                                }
+                                $(".input_txt2").attr("value", title);
+                                $(".input_multxt").text(content);
+                                $(".form_group>img").attr("src", img);
+                                $("#id").attr("value",id);
+                            });
+                        }
+                    });
+                },
+                error: function () {
+                    alert("失败");
+                }
+            })
+        }
+        var imgName;
+        var imgContent;
+
+        function handleImg() {
+            var img = document.getElementById("input_file").files[0];
+            imgName = img.name;
+            var reader = new FileReader();
+            reader.readAsDataURL(img);
+            reader.onload = function () {
+                imgContent = reader.result;
+                $(".form_group>img").attr({"src": imgContent});
+            }
+        }
+
+        function handContent() {
+            var id=$("#id").attr("value");
+            var title = $(".input_txt2").val();
+            var content = $(".input_multxt").val();
+            if (imgName==undefined){
+                imgName="";
+            }
+            if (imgContent==undefined){
+                imgContent=""
+            }
+            var str = {"id":id,"title": title, "content": content, "imgName": imgName, "imgContent": imgContent};
+            console.log(str);
+            var data = JSON.stringify(str);
+            $.ajax({
+                url: "/v1/edit/content",
+                type: "post",
+                data: data,
+                success: function (data) {
+                    alert("no:"+data.msg_no+"   content:"+data.msg_content);
+                    console.log(data);
+                    window.location.href="/v1/index";
+                },
+                error: function () {
+                    alert("失败");
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<div class="header">
+    <a href="#" class="logo fl"><img src="/static/img/logo.png" alt="logo"></a>
+    <a href="#" class="logout fr">退 出</a>
+</div>
+
+<div class="side_bar">
+    <div class="user_info">
+        <img src="/static/img/person.png" alt="张大山">
+        <p>欢迎你 <em>李雷</em></p>
+    </div>
+
+    <div class="menu_con">
+        <div class="first_menu active"><a href="javascript:;" class="icon02">文章管理</a></div>
+        <ul class="sub_menu show">
+            <li><a href="#" class="icon031">文章列表</a></li>
+            <li><a href="#" class="icon032">添加文章</a></li>
+            <li><a href="#" class="icon034">添加分类</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="main_body" id="main_body">
+    <div class="breadcrub">
+        当前位置：文章管理>编辑文章
+    </div>
+    <div class="pannel">
+        <form name=logon method="POST" action="/v1/updatearticle" enctype="multipart/form-data">
+            <h3 class="review_title">编辑文章</h3>
+            <div class="form_group">
+                <label>文章标题：</label>
+                <input type="text" class="input_txt2" name="articleName" value="">
+            </div>
+            <div class="form_group">
+                <label>文章内容：</label>
+                <textarea class="input_multxt" name="content"></textarea>
+            </div>
+            <div class="form_group">
+                <label>上传图片：</label>
+                <img src="" width="100px" height="100px">
+                <input type="file" name="uploadname" class="input_file" id="input_file" onchange="handleImg()">
+            </div>
+            <input type="text" id="id" name="id" value="" hidden>
+            <div class="form_group indent_group line_top">
+                <input type="button" value="更 新" class="confirm" onclick="handContent()">
+                <span>{{.errmsg}}</span>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>

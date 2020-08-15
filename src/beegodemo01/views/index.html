@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理页面</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/customize.css">
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            $.ajax({
+                url: "/v1/index/content",
+                type: "post",
+                success: function (data) {
+                    var article_count;
+                    var page_count;
+                    var now_page = 1;
+                    var username;
+                    // console.log(data);
+                    $.each(data, function (index, values) {
+                        var account = 0;
+                        if (index == "article") {
+                            $.each(values, function (index, value) {
+                                // console.log(value);
+                                var id;
+                                var title;
+                                var time;
+                                var count;
+                                var type;
+                                $.each(value, function (key, vals) {
+                                    if (key=="Id") {
+                                        id=vals;
+                                    }
+                                    if (key == "Title") {
+                                        title = vals;
+                                    }
+                                    if (key == "Time") {
+                                        time = vals;
+                                    }
+                                    if (key == "Count") {
+                                        count = vals;
+                                    }
+                                    if (key == "ArticleType") {
+                                        // console.log(vals);
+                                        $.each(vals, function (key, val) {
+                                            if (key == "TypeName") {
+                                                type = val;
+                                            }
+                                        })
+                                    }
+                                });
+                                var hrefdetail="/v1/content?id="+id+"&articleType="+type;
+                                var hrefedit="/v1/edit?id="+id+"&articleType="+type;
+                                var html = "<tr>" +
+                                    "<td hidden>" + id + "</td>" +
+                                    "<td>" + title + "</td>" +
+                                    "<td><a href="+hrefdetail+">查看详情</a></td>" +
+                                    "<td>" + time + "</td>" +
+                                    "<td>" + count + "</td>" +
+                                    "<td><span class='aslink' onclick='del(this)'>删除</span></td>" +
+                                    "<td><a href="+hrefedit+">编辑</a></td>" +
+                                    "<td>" + type + "</td>" +
+                                    "</tr>";
+                                $("div>div>table>tbody>tr").eq(account).after(html);
+                                account = account + 1;
+                            });
+                        }
+
+                        if (index == "article_type") {
+                            // console.log(values)
+                            $.each(values, function (index, vals) {
+                                var typeName;
+                                $.each(vals, function (key, val) {
+                                    if (key == "TypeName") {
+                                        typeName = val;
+                                    }
+                                });
+                                html = "<option>" + typeName + "</option>";
+                                $(".sel_opt").append(html);
+                            })
+                        }
+
+                        if (index == "article_count") {
+                            article_count = values;
+                        }
+
+                        if (index == "page_count") {
+                            page_count = values;
+                        }
+                        if (index=="username"){
+                            username=values;
+                        }
+                    });
+                    $(".sel_opt").append("<option selected='selected'><option>")
+                    $(".pagenation>li>span").eq(0).text(article_count);
+                    $(".pagenation>li>span").eq(1).text(page_count);
+                    $(".pagenation>li>span").eq(2).text(now_page);
+                    $(".side_bar>.user_info>img").attr("alt",username);
+                    $(".side_bar>.user_info>p>em").text(username);
+                },
+                error: function () {
+                    alert("失败");
+                }
+            });
+        }
+
+        function selectType() {
+            var articleType = $(".sel_opt").val();
+            var str = { "TypeName": articleType };
+            var data = JSON.stringify(str);
+            $.ajax({
+                url: "/v1/index/select",
+                type: "post",
+                data: data,
+                success: function (data) {
+                    $("div>div>table>tbody>tr").not($("div>div>table>tbody>tr").eq(0)).remove();
+                    console.log(data);
+                    var article_count;
+                    var page_count;
+                    var now_page = 1;
+                    $.each(data, function (index, values) {
+                        // console.log(values);
+                        // var title;
+                        // var time;
+                        // var type;
+                        // var count;
+                        if (index == "article") {
+                            var account = 0;
+                            // console.log(values)
+                            $.each(values, function (key, value) {
+                                // console.log(vals);
+                                var id;
+                                var title;
+                                var time;
+                                var type;
+                                var count;
+                                $.each(value, function (key, vals) {
+                                    if (key=="Id") {
+                                        id=vals;
+                                    }
+                                    if (key == "Title") {
+                                        title = vals;
+                                        // console.log(vals);
+
+                                    }
+                                    if (key == "Time") {
+                                        time = vals;
+                                        // console.log(vals);
+
+                                    }
+                                    if (key == "Count") {
+                                        count = vals;
+                                        // console.log(vals);
+
+                                    }
+                                    if (key == "ArticleType") {
+                                        $.each(vals, function (key, val) {
+                                            if (key == "TypeName") {
+                                                type = val;
+                                            }
+                                        });
+                                    }
+                                });
+                                var hrefdetail="/v1/content?id="+id+"&articleType="+type;
+                                var hrefedit="/v1/edit?id="+id+"&articleType="+type;
+                                var html = "<tr>" +
+                                    "<td hidden>" + id + "</td>" +
+                                    "<td>" + title + "</td>" +
+                                    "<td><a href="+hrefdetail+">查看详情</a></td>" +
+                                    "<td>" + time + "</td>" +
+                                    "<td>" + count + "</td>" +
+                                    "<td><span class='aslink' onclick='del(this)'>删除</span></td>" +
+                                    "<td><a href="+hrefedit+">编辑</a></td>" +
+                                    "<td>" + type + "</td>" +
+                                    "</tr>";
+                                $("div>div>table>tbody>tr").eq(account).after(html);
+                                // console.log("title:"+title+"   time"+time+"    count:"+count+"    type:"+type)
+                                account = account + 1;
+                            });
+                        }
+                        if (index == "article_count") {
+                            article_count = values;
+                        }
+                        if (index == "page_count") {
+                            page_count = values;
+                        }
+                    });
+                    $(".pagenation>li>span").eq(0).text(article_count);
+                    $(".pagenation>li>span").eq(1).text(page_count);
+                    $(".pagenation>li>span").eq(2).text(now_page);
+                },
+                error: function () {
+                    alert("失败");
+                }
+            });
+        }
+
+        function paging(obj) {
+            var handle = $(obj).attr("id");
+            var articleType = $(".sel_opt").val();
+            var nowPage = $(".pagenation>li>span").eq(2).text();
+            var str = { "handle": handle, "articleType": articleType, "nowPage": nowPage };
+            console.log(str);
+            var data = JSON.stringify(str);
+            $.ajax({
+                url: "/v1/index/paging",
+                type: "post",
+                data: data,
+                success: function (data) {
+                    // alert("成功");
+                    // console.log(data);
+                    $("div>div>table>tbody>tr").not($("div>div>table>tbody>tr").eq(0)).remove();
+                    var now_page;
+                    $.each(data, function (index, values) {
+                        if (index == "article") {
+                            var account = 0;
+                            $.each(values, function (key, value) {
+                                // console.log(vals);
+                                var id;
+                                var title;
+                                var time;
+                                var type;
+                                var count;
+                                $.each(value, function (key, vals) {
+                                    if (key=="Id") {
+                                        id=vals;
+                                    }
+                                    if (key == "Title") {
+                                        title = vals;
+                                    }
+                                    if (key == "Time") {
+                                        time = vals;
+                                    }
+                                    if (key == "Count") {
+                                        count = vals;
+                                    }
+                                    if (key == "ArticleType") {
+                                        $.each(vals, function (key, val) {
+                                            if (key == "TypeName") {
+                                                type = val;
+                                            }
+                                        });
+                                    }
+                                });
+                                var hrefdetail="/v1/content?id="+id+"&articleType="+type;
+                                var hrefedit="/v1/edit?id="+id+"&articleType="+type;
+                                var html = "<tr>" +
+                                    "<td hidden>" + id + "</td>" +
+                                    "<td>" + title + "</td>" +
+                                    "<td><a href="+hrefdetail+">查看详情</a></td>" +
+                                    "<td>" + time + "</td>" +
+                                    "<td>" + count + "</td>" +
+                                    "<td><span class='aslink' onclick='del(this)'>删除</span></td>" +
+                                    "<td><a href="+hrefedit+">编辑</a></td>" +
+                                    "<td>" + type + "</td>" +
+                                    "</tr>";
+                                $("div>div>table>tbody>tr").eq(account).after(html);
+                                account = account + 1;
+                            });
+                        }
+                        if (index == "nowpage") {
+                            now_page = values;
+                        }
+                    });
+                    $(".pagenation>li>span").eq(2).text(now_page);
+                },
+                error: function () {
+                    alert("失败");
+                }
+            });
+        }
+        function del(obj) {
+            var articleType = $(".sel_opt").val();
+            var nowPage = $(".pagenation>li>span").eq(2).text();
+            var id=$(obj).parent().parent().children().eq(0).text();
+            var str={"articleType": articleType, "nowPage": nowPage,"id":id};
+            var data=JSON.stringify(str);
+            var r=confirm("是否删除？");
+            if (r==true) {
+                $.ajax({
+                    url:"/v1/del",
+                    type:"post",
+                    data:data,
+                    success: function (data) {
+                    // alert("成功");
+                    console.log(data);
+                    $("div>div>table>tbody>tr").not($("div>div>table>tbody>tr").eq(0)).remove();
+                    var now_page;
+                    var article_count;
+                    var page_count;
+                    $.each(data, function (index, values) {
+                        if (index == "article") {
+                            var account = 0;
+                            $.each(values, function (key, value) {
+                                // console.log(vals);
+                                var id;
+                                var title;
+                                var time;
+                                var type;
+                                var count;
+                                $.each(value, function (key, vals) {
+                                    if (key=="Id") {
+                                        id=vals;
+                                    }
+                                    if (key == "Title") {
+                                        title = vals;
+                                    }
+                                    if (key == "Time") {
+                                        time = vals;
+                                    }
+                                    if (key == "Count") {
+                                        count = vals;
+                                    }
+                                    if (key == "ArticleType") {
+                                        $.each(vals, function (key, val) {
+                                            if (key == "TypeName") {
+                                                type = val;
+                                            }
+                                        });
+                                    }
+                                });
+                                var hrefdetail="/v1/content?id="+id+"&articleType="+type;
+                                var hrefedit="/v1/edit?id="+id+"&articleType="+type;
+                                var html = "<tr>" +
+                                    "<td hidden>" + id + "</td>" +
+                                    "<td>" + title + "</td>" +
+                                    "<td><a href="+hrefdetail+">查看详情</a></td>" +
+                                    "<td>" + time + "</td>" +
+                                    "<td>" + count + "</td>" +
+                                    "<td><span class='aslink' onclick='del(this)'>删除</span></td>" +
+                                    "<td><a href="+hrefedit+">编辑</a></td>" +
+                                    "<td>" + type + "</td>" +
+                                    "</tr>";
+                                $("div>div>table>tbody>tr").eq(account).after(html);
+                                account = account + 1;
+                            });
+                        }
+                        if (index == "nowpage") {
+                            now_page = values;
+                        }
+                        if (index=="pageCount") {
+                            page_count=values;
+                        }
+                        if (index=="counts") {
+                            article_count=values;
+                        }
+                    });
+                    $(".pagenation>li>span").eq(0).text(article_count);
+                    $(".pagenation>li>span").eq(1).text(page_count);
+                    $(".pagenation>li>span").eq(2).text(now_page);
+                },
+                    error:function(){
+                        alert("失败");
+                    }
+                });
+            }
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="#" class="logo fl"><img src="/static/img/logo.png" alt="logo"></a>
+        <a href="/logout" class="logout fr" onclick="if(confirm('确定退出?')==false)return false;">退 出</a>
+    </div>
+
+    <div class="side_bar">
+        <div class="user_info">
+            <img src="/static/img/person.png" alt="张大山">
+            <p>欢迎你 <em>{{.userName}}</em></p>
+        </div>
+
+        <div class="menu_con">
+            <div class="first_menu active"><a href="javascript:;" class="icon02">文章管理</a></div>
+            <ul class="sub_menu show">
+                <li><a href="/v1/index" class="icon031">文章列表</a></li>
+                <li><a href="/v1/addarticle" class="icon032">添加文章</a></li>
+                <li><a href="/v1/addtype" class="icon034">添加分类</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="main_body" id="main_body">
+        <div class="breadcrub">
+            当前位置：文章管理>文章列表
+        </div>
+        <div class="pannel">
+            <span class="sel_label">请选择文章分类：</span>
+            <form action="/v1/index" method="GET" id="form">
+                <select name="select" id="select" class="sel_opt" onchange="selectType()">
+
+                </select>
+            </form>
+
+            <table class="common_table">
+                <tr>
+                    <th width="43%">文章标题</th>
+                    <th width="10%">文章内容</th>
+                    <th width="16%">添加时间</th>
+                    <th width="7%">阅读量</th>
+                    <th width="7%">删除</th>
+                    <th width="7%">编辑</th>
+                    <th width="10%">文章类型</th>
+                </tr>
+
+            </table>
+
+            <ul class="pagenation">
+                <li><button id="first" onclick="paging(this)">首页</button></li>
+                <li><button id="prev" onclick="paging(this)">上一页</button></li>
+                <li><button id="next" onclick="paging(this)">下一页</button></li>
+                <li><button id="last" onclick="paging(this)">末页</button></li>
+                <li>共<span></span>条记录/共<span></span>页/当前<span></span>页</li>
+            </ul>
+
+        </div>
+    </div>
+</body>
+
+</html>

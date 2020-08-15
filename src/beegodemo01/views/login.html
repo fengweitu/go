@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <script src="../static/js/jquery.cookie.js"></script>
+    <script type="text/javascript">
+        window.onload=function () {
+            var cookie;
+            $.ajax({
+                url: "/sendcookie",
+                type: "post",
+                success:function (data) {
+                    cookie=data.username;
+                    // console.log("第一个cookie：",cookie)
+                    // console.log("第二个cookie：",cookie)
+                    if (cookie==""){
+                        document.getElementById("remember").checked=false;
+                    }else{
+                        document.getElementById("remember").checked=true;
+                        $("#username").attr("value",cookie);
+                    }
+                }
+            });
+        }
+        function HandleLogin(){
+            var username=$("#username").val();
+            var password=$("#password").val();
+            var check=document.getElementById("remember").checked;
+            var str={"username":username,"password":password,"check":check};
+            var data_login=JSON.stringify(str)
+            $.ajax({
+                url:"/login",
+                type:"post",
+                data:data_login,
+                success:function (data) {
+                    if (data.msg_no==1){
+                        alert("no:"+data.msg_no+" content:"+data.msg_content);
+                        window.location.href="/login";
+                    }
+                    if (data.msg_no==2){
+                        alert("no:"+data.msg_no+" content:"+data.msg_content);
+                        window.location.href="/v1/index";
+                    }
+                },
+                error:function () {
+                    alert("登入出错");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="login_logo">
+    <img src="/static/img/logo.png" alt="">
+</div>
+<form class="login_form" name="login" method="POST" action="/login">
+    <h1 class="login_title">用户登录</h1>
+    <input type="text" class="input_txt" id="username" name="userName">
+    <input type="password" name="password" id="password" class="input_txt">
+    <div class="remember"><input type="checkbox" id="remember" name="remember"><label>记住用户名</label></div>
+    <input type="button" value="登 录" class="input_sub" onclick="HandleLogin()">
+</form>
+<div class="login_bg"></div>
+</body>
+</html>
