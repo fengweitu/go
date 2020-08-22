@@ -1,79 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>文章详情</title>
-     <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <script src="../static/js/jquery-1.12.4.min.js"></script>
     <script type="text/javascript">
-        window.onload=function () {
+        window.onload = function () {
             //http://localhost:8083/v1/content?id=17&articleType=%E8%AF%B7%E9%97%AE
-            var href=window.location.href;
+            var href = window.location.href;
             console.log(href);
-            var hrefdata=href.split("?")[1];
-            var strdata=hrefdata.split("&");
-            var id=strdata[0].split("=")[1];
-            var type=decodeURI(strdata[1].split("=")[1], "utf-8");
-            var str={"id":id};
-            var data=JSON.stringify(str);
+            var hrefdata = href.split("?")[1];
+            var strdata = hrefdata.split("&");
+            var id = strdata[0].split("=")[1];
+            var type = decodeURI(strdata[1].split("=")[1], "utf-8");
+            var str = { "id": id };
+            var data = JSON.stringify(str);
             $.ajax({
-                url:"/v1/content",
-                type:"post",
-                data:data,
-                success:function (data) {
+                url: "/v1/content",
+                type: "post",
+                data: data,
+                success: function (data) {
                     console.log(data);
-                    $.each(data,function (index,values) {
+                    $.each(data, function (index, values) {
                         var title;
                         var content;
                         var count;
-                        var usernames="";
+                        var usernames = "";
                         var time;
                         var img;
-                        if (index=="article"){
-                            $.each(values,function (index,value) {
-                                if (index=="Title"){
-                                    title=value;
+                        var session;
+                        if (index == "article") {
+                            $.each(values, function (index, value) {
+                                if (index == "Title") {
+                                    title = value;
                                 }
-                                if (index=="Content"){
-                                    content=value;
+                                if (index == "Content") {
+                                    content = value;
                                 }
-                                if(index=="Count"){
-                                    count=value;
+                                if (index == "Count") {
+                                    count = value;
                                 }
-                                if (index=="Time"){
-                                    time=value;
+                                if (index == "Time") {
+                                    time = value;
                                 }
-                                if (index=="Img"){
-                                    img=value;
+                                if (index == "Img") {
+                                    img = value;
                                 }
                             });
                             $("#detail_title").text(title);
                             $("#detail_type").text(type);
                             $("#detail_content").text(content);
-                            $("#detail_img").attr("src",img)
+                            $("#detail_img").attr("src", img)
                             $("#detaile_count").text(count);
                             $("#detail_time").text(time);
                         }
-                        if (index=="users"){
-                            $.each(values,function (index,vals) {
-                               $.each(vals,function (key,val) {
-                                   if (key=="Username"){
-                                       usernames=usernames+val+" | ";
-                                   }
-                               });
+                        if (index == "users") {
+                            $.each(values, function (index, vals) {
+                                $.each(vals, function (key, val) {
+                                    if (key == "Username") {
+                                        usernames = usernames + val + " | ";
+                                    }
+                                });
                             });
                             $("#detail_username").text(usernames);
                         }
+                        if (index == "username") {
+                            session = values;
+                            $(".side_bar>.user_info>img").attr("alt", session);
+                            $(".side_bar>.user_info>p>em").text(session);
+                        }
                     });
                 },
-                error:function () {
+                error: function () {
                     alert("失败");
                 }
             })
         }
     </script>
 </head>
+
 <body>
     <div class="header">
         <a href="#" class="logo fl"><img src="/static/img/logo.png" alt="logo"></a>
@@ -89,14 +97,14 @@
         <div class="menu_con">
             <div class="first_menu active"><a href="javascript:;" class="icon02">文章管理</a></div>
             <ul class="sub_menu show">
-                <li><a href="#" class="icon031">文章列表</a></li>
-                <li><a href="#" class="icon032">添加文章</a></li>
-                <li><a href="#" class="icon034">添加分类</a></li>
+                <li><a href="/v1/index" class="icon031">文章列表</a></li>
+                <li><a href="/v1/addarticle" class="icon032">添加文章</a></li>
+                <li><a href="/v1/addtype" class="icon034">添加分类</a></li>
             </ul>
         </div>
     </div>
 
-        <div class="main_body" id="main_body">
+    <div class="main_body" id="main_body">
         <div class="breadcrub">
             当前位置：文章管理>文章列表>文章详情
         </div>
@@ -135,4 +143,5 @@
         </div>
     </div>
 </body>
+
 </html>

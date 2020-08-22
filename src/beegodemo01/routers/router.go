@@ -2,6 +2,7 @@ package routers
 
 import (
 	"beegodemo01/controllers"
+
 	"github.com/astaxie/beego/context"
 
 	"github.com/astaxie/beego"
@@ -23,20 +24,20 @@ func init() {
 
 	beego.Router("/v1/addtype", &controllers.AddTypeController{})
 	beego.Router("/v1/addtype/content", &controllers.AddTypeController{}, "get:ShowArticleType;post:HandleArticleType")
-	beego.Router("/v1/deltype",&controllers.DeleteController{},"post:DeleteType")
+	beego.Router("/v1/deltype", &controllers.DeleteController{}, "post:DeleteType")
 
 	beego.Router("/v1/addarticle", &controllers.AddArticleController{})
 	beego.Router("/v1/addarticle/content", &controllers.AddArticleController{}, "get:ShowAddArticle;post:HandleAddArticle")
 	// beego.Router("/v1/addarticle/img", &controllers.AddArticleController{}, "post:HandleImg")
 
-	beego.Router("/v1/content",&controllers.ContentController{},"get:ShowContent;post:HandleContent")
+	beego.Router("/v1/content", &controllers.ContentController{}, "get:ShowContent;post:HandleContent")
 
-	beego.Router("/v1/edit",&controllers.EditController{},"get:ShowEdit;post:ShowEditContent")
-	beego.Router("/v1/edit/content",&controllers.EditController{},"post:HandleEditContent")
+	beego.Router("/v1/edit", &controllers.EditController{}, "get:ShowEdit;post:ShowEditContent")
+	beego.Router("/v1/edit/content", &controllers.EditController{}, "post:HandleEditContent")
 
 	beego.Router("/v1/del", &controllers.DeleteController{}, "post:DeleteArticle")
 
-	beego.Router("/logout",&controllers.LogoutController{},"get:HandleLogout")
+	beego.Router("/logout", &controllers.LogoutController{}, "get:HandleLogout")
 }
 
 var FilterFunc = func(ctx *context.Context) {
@@ -46,4 +47,3 @@ var FilterFunc = func(ctx *context.Context) {
 
 	}
 }
-

@@ -36,12 +36,12 @@ func (this *AddArticleController) ShowAddArticle() {
 		this.ServeJSON()
 		return
 	}
-	username:=this.GetSession("username")
+	username := this.GetSession("username")
 
 	resp["msg_no"] = 2
 	resp["msg_content"] = "从数据库获取文章类型成功"
 	resp["articletype"] = articleType
-	resp["username"]=username
+	resp["username"] = username
 	this.Data["json"] = resp
 	this.ServeJSON()
 	return
@@ -94,17 +94,17 @@ func (this *AddArticleController) HandleAddArticle() {
 		this.ServeJSON()
 		return
 	}
-	sum:=0
-	str:=[]string{".bmp",".jpg",".png",".tif",".gif",".pcx",".tga",".exif",".fpx",".svg",".psd",".cdr",".pcd",".dxf",".ufo",".eps",".ai",".raw",".WMF",".webp"}
-	for i :=range str{
-		if imgname_suffix==str[i] {
+	sum := 0
+	str := []string{".bmp", ".jpg", ".png", ".tif", ".gif", ".pcx", ".tga", ".exif", ".fpx", ".svg", ".psd", ".cdr", ".pcd", ".dxf", ".ufo", ".eps", ".ai", ".raw", ".WMF", ".webp"}
+	for i := range str {
+		if imgname_suffix == str[i] {
 			sum++
 		}
 	}
-	if sum!=1 {
-		resp["msg_no"]=1
-		resp["msg_content"]="文件类型出错"
-		this.Data["json"]=resp
+	if sum != 1 {
+		resp["msg_no"] = 1
+		resp["msg_content"] = "文件类型出错"
+		this.Data["json"] = resp
 		this.ServeJSON()
 		return
 	}
@@ -112,7 +112,7 @@ func (this *AddArticleController) HandleAddArticle() {
 	imgtime := time.Now().Format("2006-01-02 15-04-05")
 	imgname := imgtime + imgname_suffix
 	path := "./static/img/" + imgname
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, os.ModeAppend|os.ModePerm)
 	if err != nil {
 		beego.Info("创建文件失败:", err)
 		resp["msg_no"] = 1
@@ -142,28 +142,28 @@ func (this *AddArticleController) HandleAddArticle() {
 		return
 	}
 
-	articletype:=models.ArticleType{TypeName: articleContent.ArticleType}
-	o:=orm.NewOrm()
-	err=o.Read(&articletype,"TypeName")
+	articletype := models.ArticleType{TypeName: articleContent.ArticleType}
+	o := orm.NewOrm()
+	err = o.Read(&articletype, "TypeName")
 	if err != nil {
-		resp["msg_no"]=1
-		resp["msg_content"]="文章类型不存在"
-		this.Data["json"]=resp
+		resp["msg_no"] = 1
+		resp["msg_content"] = "文章类型不存在"
+		this.Data["json"] = resp
 		this.ServeJSON()
 		return
 	}
 
-	article:=models.Article{
+	article := models.Article{
 		Title:       articleContent.ArticleTitle,
 		Content:     articleContent.ArticleContent,
-		Img:         "."+path,
+		Img:         "." + path,
 		ArticleType: &articletype,
 	}
-	_,err=o.Insert(&article)
+	_, err = o.Insert(&article)
 	if err != nil {
-		resp["msg_no"]=1
-		resp["msg_content"]="添加文章失败"
-		this.Data["json"]=resp
+		resp["msg_no"] = 1
+		resp["msg_content"] = "添加文章失败"
+		this.Data["json"] = resp
 		this.ServeJSON()
 		return
 	}

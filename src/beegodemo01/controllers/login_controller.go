@@ -65,7 +65,7 @@ func (this *LoginController) HandleLogin() {
 	o := orm.NewOrm()
 	err = o.Read(&user, "username")
 	if err != nil {
-		resp["msg_no"] = 1
+		resp["msg_no"] = 0
 		resp["msg_content"] = "用户名不存在"
 		this.Data["json"] = resp
 		this.ServeJSON()

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>添加文章内容</title>
@@ -7,34 +8,34 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <script src="../static/js/jquery-1.12.4.min.js"></script>
     <script>
-        window.onload=function(){
+        window.onload = function () {
             $.ajax({
-                url:"/v1/addarticle/content",
-                type:"get",
-                success:function(data){
+                url: "/v1/addarticle/content",
+                type: "get",
+                success: function (data) {
                     var username;
-                $.each(data,function(index,vals){
-                    if(index=="articletype"){
-                        $.each(vals,function(key,val){
-                            var typeName;
-                            var html;
-                            $.each(val,function(key,value){
-                                if(key=="TypeName"){
-                                    typeName=value;
-                                }
+                    $.each(data, function (index, vals) {
+                        if (index == "articletype") {
+                            $.each(vals, function (key, val) {
+                                var typeName;
+                                var html;
+                                $.each(val, function (key, value) {
+                                    if (key == "TypeName") {
+                                        typeName = value;
+                                    }
+                                });
+                                html = "<option>" + typeName + "</option>";
+                                $(".sel_opt").append(html);
                             });
-                            html="<option>"+typeName+"</option>";
-                            $(".sel_opt").append(html);
-                        });
-                    }
-                    if (index=="username"){
-                        username=vals;
-                    }
-                    $(".side_bar>.user_info>img").attr("alt",username);
-                    $(".side_bar>.user_info>p>em").text(username);
-                });
+                        }
+                        if (index == "username") {
+                            username = vals;
+                        }
+                        $(".side_bar>.user_info>img").attr("alt", username);
+                        $(".side_bar>.user_info>p>em").text(username);
+                    });
                 },
-                error:function(){
+                error: function () {
                     alert("失败");
                 }
             });
@@ -42,47 +43,49 @@
 
         var imgName;
         var imgContent;
-        function handleImg(){
-            var img=document.getElementById("input_file").files[0];
-            imgName=img.name;
-            var reader=new FileReader();
+        function handleImg() {
+            var img = document.getElementById("input_file").files[0];
+            imgName = img.name;
+            var reader = new FileReader();
             reader.readAsDataURL(img);
-            reader.onload=function(){
-                imgContent=reader.result;
-                $(".img01").attr({"src":imgContent,"width":"100px","height":"100px"});
+            reader.onload = function () {
+                imgContent = reader.result;
+                $(".img01").attr({ "src": imgContent, "width": "100px", "height": "100px" });
             }
         }
 
-        function handleContent(){
-            var articleTitle=$(".input_txt2").val();
-            var articleType=$(".sel_opt").val();
-            var articleContent=$(".input_multxt").val();
-            if (imgName==undefined||imgContent){
+        function handleContent() {
+            var articleTitle = $(".input_txt2").val();
+            var articleType = $(".sel_opt").val();
+            var articleContent = $(".input_multxt").val();
+            if (imgName == undefined && imgContent == undefined) {
                 alert("图片为空");
             }
-            var str={"articleTitle":articleTitle,"articleType":articleType,"articleContent":articleContent,"imgName":imgName,"imgContent":imgContent};
-            var data=JSON.stringify(str);
+            var str = { "articleTitle": articleTitle, "articleType": articleType, "articleContent": articleContent, "imgName": imgName, "imgContent": imgContent };
+            var data = JSON.stringify(str);
             $.ajax({
-                url:"/v1/addarticle/content",
-                type:"post",
-                data:data,
-                success:function(data){
+                url: "/v1/addarticle/content",
+                type: "post",
+                data: data,
+                success: function (data) {
                     console.log(data);
                     console.log(data.data.ImgContent);
-                    window.location.href="/v1/index";
+                    alert(data.msg_content);
+                    window.location.href = "/v1/index";
                 },
-                error:function(){
+                error: function () {
                     alert("出错");
                 }
             });
         }
     </script>
 </head>
+
 <body>
-   <div class="header">
+    <div class="header">
         <a href="#" class="logo fl"><img src="/static/img/logo.png" alt="logo"></a>
-       <a href="/logout" class="logout fr" onclick="if(confirm('确定退出?')==false)return false;">退 出</a>
-   </div>
+        <a href="/logout" class="logout fr" onclick="if(confirm('确定退出?')==false)return false;">退 出</a>
+    </div>
 
     <div class="side_bar">
         <div class="user_info">
@@ -106,33 +109,34 @@
         </div>
         <div class="pannel">
             <form method="POST" action="/v1/addarticle" enctype="multipart/form-data">
-            <h3 class="review_title">添加文章</h3>
-            <div class="form_group">
-                <label>文章标题：</label>
-                <input type="text" class="input_txt2" name="articleName" >
-            </div>
-            <div class="form_group">
-                <label>文章类型：</label>
-                <select class="sel_opt" name="select">
+                <h3 class="review_title">添加文章</h3>
+                <div class="form_group">
+                    <label>文章标题：</label>
+                    <input type="text" class="input_txt2" name="articleName">
+                </div>
+                <div class="form_group">
+                    <label>文章类型：</label>
+                    <select class="sel_opt" name="select">
 
-                </select>
-            </div>
-            <div class="form_group">
-                <label>文章内容：</label>
-                <textarea class="input_multxt" name="content"></textarea>
-            </div>
-            <div class="form_group">
-                <label>上传图片：</label>
-                <!-- <div class="img_file" id="img_file"></div> -->
-                <img class="img01" src="" alt="">
-                <input type="file" class="input_file"  name="uploadname" id="input_file" onchange="handleImg()">
-            </div>
-            <div class="form_group indent_group line_top">
-                <input type="button" value="添 加" class="confirm" onclick="handleContent()">
-            </div>
-        </form>
+                    </select>
+                </div>
+                <div class="form_group">
+                    <label>文章内容：</label>
+                    <textarea class="input_multxt" name="content"></textarea>
+                </div>
+                <div class="form_group">
+                    <label>上传图片：</label>
+                    <!-- <div class="img_file" id="img_file"></div> -->
+                    <img class="img01" src="" alt="">
+                    <input type="file" class="input_file" name="uploadname" id="input_file" onchange="handleImg()">
+                </div>
+                <div class="form_group indent_group line_top">
+                    <input type="button" value="添 加" class="confirm" onclick="handleContent()">
+                </div>
+            </form>
         </div>
-</div>
+    </div>
 
 </body>
+
 </html>
